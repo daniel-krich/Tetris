@@ -18,13 +18,13 @@ namespace TetrisGame.Tetris.Game
 
         public void Run()
         {
-            this.grid = new Grid();
+            this.grid = new Grid(20, 10);
             this.display = new Display(this.grid);
-            this.controls = new Controls(this.grid);
+            this.controls = new Controls(this.grid, this.display);
 
             while(grid.UpdateGame())
             {
-                this.display.UpdateFrame();
+                Thread.Sleep(200);
             }
         }
     }

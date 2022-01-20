@@ -23,14 +23,19 @@ namespace TetrisGame.Tetris.Display
             {
                 for (int column = 0; column < grid.GetGrid().GetLength(1); column++)
                 {
-                    if (grid.GetGrid()[row, column] == 0)
+                    if (grid.GetGrid()[row, column] == CellType.FixedCell)
                     {
-                        Console.BackgroundColor = ConsoleColor.White;
+                        Console.BackgroundColor = ConsoleColor.Gray;
+                        Console.Write("\x20\x20");
+                    }
+                    else if (grid.GetGrid()[row, column] == CellType.PlayerCell)
+                    {
+                        Console.BackgroundColor = ConsoleColor.DarkCyan;
                         Console.Write("\x20\x20");
                     }
                     else
                     {
-                        Console.BackgroundColor = ConsoleColor.DarkCyan;
+                        Console.BackgroundColor = ConsoleColor.White;
                         Console.Write("\x20\x20");
                     }
                     Console.ResetColor();
