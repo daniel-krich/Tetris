@@ -22,6 +22,9 @@ namespace TetrisGame.Tetris.Controls
         private Grid grid;
         private Display display;
 
+        public Thread currentThread;
+        public bool isFinished;
+
         public Controls(Grid grid, Display display)
         {
             this.grid = grid;
@@ -29,12 +32,13 @@ namespace TetrisGame.Tetris.Controls
 
             this.display.UpdateFrame();
 
-            new Thread(InputProcess).Start();
+            this.currentThread = new Thread(InputProcess);
+            this.currentThread.Start();
         }
 
         private void InputProcess()
         {
-            while(true)
+            while(!this.isFinished)
             {
                 GameKeys currentKey = (GameKeys)Console.ReadKey(false).Key;
                 if (currentKey == GameKeys.Down || currentKey == GameKeys.Left || currentKey == GameKeys.Right)

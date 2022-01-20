@@ -24,8 +24,19 @@ namespace TetrisGame.Tetris.Game
 
             while(grid.UpdateGame())
             {
-                Thread.Sleep(200);
+                Thread.Sleep(1);
             }
+
+            this.controls.isFinished = true;
+
+        WaitForThreadToFinish:
+            if (this.controls.currentThread.IsAlive)
+                goto WaitForThreadToFinish;
+
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Clear();
+            Console.WriteLine("Game is finished...");
         }
     }
 }
