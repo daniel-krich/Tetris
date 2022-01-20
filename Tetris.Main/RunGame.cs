@@ -12,7 +12,7 @@ namespace TetrisGame.Tetris.Main
         static void Main()
         {
             Tetris t = new Tetris();
-            t.Run();
+            t.Run(20, 10);
         }
     }
 }

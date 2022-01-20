@@ -16,9 +16,9 @@ namespace TetrisGame.Tetris.Game
         private Display display { get; set; }
         private Controls controls { get; set; }
 
-        public void Run()
+        public void Run(int rows, int columns)
         {
-            this.grid = new Grid(20, 10);
+            this.grid = new Grid(rows, columns);
             this.display = new Display(this.grid);
             this.controls = new Controls(this.grid, this.display);
 
