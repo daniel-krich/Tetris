@@ -60,6 +60,8 @@ namespace TetrisGame.Tetris.Game
         {
             if (isGameFinished())
                 return false;
+            if (!isMergeSafe(this.currentCube))
+                return false;
             return true;
         }
 
@@ -112,7 +114,7 @@ namespace TetrisGame.Tetris.Game
         {
             ClearPlayerCubeFromGrid();
 
-            if(WipeOutFullRows())
+            while(WipeOutFullRows())
                 CollapsFixedCells();
 
             for (int row = 0; row < cube.GetCube().GetLength(0); row++)
