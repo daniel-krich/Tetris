@@ -14,7 +14,8 @@ namespace TetrisGame.Tetris.Controls
     {
         Left = 37,
         Right = 39,
-        Down = 40
+        Down = 40,
+        Rotate_Key = 88
     }
 
     class Controls
@@ -44,6 +45,11 @@ namespace TetrisGame.Tetris.Controls
                 if (currentKey == GameKeys.Down || currentKey == GameKeys.Left || currentKey == GameKeys.Right)
                 {
                     this.grid.GetCurrentCube().Move(currentKey);
+                    this.display.UpdateFrame();
+                }
+                else if(currentKey == GameKeys.Rotate_Key)
+                {
+                    this.grid.GetCurrentCube().Rotate();
                     this.display.UpdateFrame();
                 }
             }

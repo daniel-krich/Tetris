@@ -105,7 +105,41 @@ namespace TetrisGame.Tetris.Game
 
         public void Rotate()
         {
+            CellType[,] localClone = this.cube.Clone() as CellType[,];
+            int maxRowVal = 0;
+            int minRowVal = 0;
+            for (int row = 0; row < this.cube.GetLength(0); row++)
+            {
+                for (int column = 0; column < this.cube.GetLength(1); column++)
+                {
+                    if (this.cube[row, column] == CellType.PlayerCell)
+                    {
+                        if (minRowVal == 0)
+                            minRowVal = row;
+                        maxRowVal = row;
+                    }
+                }
+            }
 
+            if (maxRowVal + (maxRowVal - minRowVal) < this.cube.GetLength(0))
+            {
+
+                for (int row = maxRowVal, offset = 0; row >= minRowVal; row--, offset++)
+                {
+                    for (int column = 0; column < this.cube.GetLength(1); column++)
+                    {
+                        CellType swap = this.cube[maxRowVal - offset + (maxRowVal - minRowVal), column];
+                        this.cube[maxRowVal - offset + (maxRowVal - minRowVal), column] = this.cube[minRowVal + offset - (maxRowVal - minRowVal), column];
+                        this.cube[minRowVal + offset - (maxRowVal - minRowVal), column] = swap;
+                    }
+                }
+            }
+
+
+            if (this.grid.isMergeSafe(this))
+                this.grid.Merge(this);
+            else
+                this.cube = localClone;
         }
 
 

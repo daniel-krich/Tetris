@@ -19,6 +19,8 @@ namespace TetrisGame.Tetris.Display
         public void UpdateFrame()
         {
             Console.Clear();
+            DisplayControls();
+            //
             for (int row = 0; row < grid.GetGrid().GetLength(0); row++)
             {
                 for (int column = 0; column < grid.GetGrid().GetLength(1); column++)
@@ -42,6 +44,15 @@ namespace TetrisGame.Tetris.Display
                 }
                 Console.Write("\n");
             }
+        }
+
+        public void DisplayControls()
+        {
+            Console.BackgroundColor = ConsoleColor.DarkYellow;
+            Console.ForegroundColor = ConsoleColor.Black;
+            Console.WriteLine("Use \"Left\", \"Right\", \"Down\" buttons to control the shape.");
+            Console.WriteLine("Use \"X\" to flip the shape\n");
+            Console.ResetColor();
         }
     }
 }
