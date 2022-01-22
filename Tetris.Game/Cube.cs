@@ -59,52 +59,52 @@ namespace TetrisGame.Tetris.Game
             {
                 case 1: // l_shape
                     randType = CubeType.l_shape;
-                    randCube[0, 0] = CellType.PlayerCell;
-                    randCube[1, 0] = CellType.PlayerCell;
-                    randCube[2, 0] = CellType.PlayerCell;
-                    randCube[3, 0] = CellType.PlayerCell;
+                    randCube[0, 0 + this.columns / 2] = CellType.PlayerCell;
+                    randCube[1, 0 + this.columns / 2] = CellType.PlayerCell;
+                    randCube[2, 0 + this.columns / 2] = CellType.PlayerCell;
+                    randCube[3, 0 + this.columns / 2] = CellType.PlayerCell;
                     break;
                 case 2: // J_shape
                     randType = CubeType.J_shape;
-                    randCube[0, 3] = CellType.PlayerCell;
-                    randCube[1, 3] = CellType.PlayerCell;
-                    randCube[2, 3] = CellType.PlayerCell;
-                    randCube[2, 2] = CellType.PlayerCell;
+                    randCube[0, 3 + this.columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[1, 3 + this.columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[2, 3 + this.columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[2, 2 + this.columns / 2 - 2] = CellType.PlayerCell;
                     break;
                 case 3: // L_shape
                     randType = CubeType.L_shape;
-                    randCube[0, 0] = CellType.PlayerCell;
-                    randCube[1, 0] = CellType.PlayerCell;
-                    randCube[2, 0] = CellType.PlayerCell;
-                    randCube[2, 1] = CellType.PlayerCell;
+                    randCube[0, 0 + this.columns / 2] = CellType.PlayerCell;
+                    randCube[1, 0 + this.columns / 2] = CellType.PlayerCell;
+                    randCube[2, 0 + this.columns / 2] = CellType.PlayerCell;
+                    randCube[2, 1 + this.columns / 2] = CellType.PlayerCell;
                     break;
                 case 4: // O_shape
                     randType = CubeType.O_shape;
-                    randCube[1, 1] = CellType.PlayerCell;
-                    randCube[1, 2] = CellType.PlayerCell;
-                    randCube[2, 1] = CellType.PlayerCell;
-                    randCube[2, 2] = CellType.PlayerCell;
+                    randCube[1, 1 + this.columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[1, 2 + this.columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[2, 1 + this.columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[2, 2 + this.columns / 2 - 2] = CellType.PlayerCell;
                     break;
                 case 5: // Z_shape
                     randType = CubeType.Z_shape;
-                    randCube[1, 1] = CellType.PlayerCell;
-                    randCube[1, 2] = CellType.PlayerCell;
-                    randCube[2, 2] = CellType.PlayerCell;
-                    randCube[2, 3] = CellType.PlayerCell;
+                    randCube[1, 1 + this.columns / 2] = CellType.PlayerCell;
+                    randCube[1, 2 + this.columns / 2] = CellType.PlayerCell;
+                    randCube[2, 2 + this.columns / 2] = CellType.PlayerCell;
+                    randCube[2, 3 + this.columns / 2] = CellType.PlayerCell;
                     break;
                 case 6: // T_shape
                     randType = CubeType.T_shape;
-                    randCube[2, 1] = CellType.PlayerCell;
-                    randCube[3, 0] = CellType.PlayerCell;
-                    randCube[3, 1] = CellType.PlayerCell;
-                    randCube[3, 2] = CellType.PlayerCell;
+                    randCube[2, 1 + this.columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[3, 0 + this.columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[3, 1 + this.columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[3, 2 + this.columns / 2 - 2] = CellType.PlayerCell;
                     break;
                 case 7: // S_shape
                     randType = CubeType.S_shape;
-                    randCube[1, 3] = CellType.PlayerCell;
-                    randCube[1, 2] = CellType.PlayerCell;
-                    randCube[2, 2] = CellType.PlayerCell;
-                    randCube[2, 1] = CellType.PlayerCell;
+                    randCube[1, 3 + this.columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[1, 2 + this.columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[2, 2 + this.columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[2, 1 + this.columns / 2 - 2] = CellType.PlayerCell;
                     break;
                 default:
                     break;
@@ -165,12 +165,12 @@ namespace TetrisGame.Tetris.Game
         /// <param name="key">GameKeys enum (Down, Left, Right, X)</param>
         /// <param name="cloneMove">used to predict if the next move is a dead end</param>
         /// <returns>false if can't move that direction, or true otherwise.</returns>
-        public bool Move(GameKeys key, bool cloneMove = false)
+        public bool Move(VirtualKeyCodes key, bool cloneMove = false)
         {
             CellType[,] localClone = this.cube.Clone() as CellType[,];
             switch (key)
             {
-                case GameKeys.Down:
+                case VirtualKeyCodes.VK_DOWN:
                     for (int row = this.cube.GetLength(0) - 1; row >= 0; row--)
                     {
                         for (int column = 0; column < this.cube.GetLength(1); column++)
@@ -214,7 +214,7 @@ namespace TetrisGame.Tetris.Game
                         return false;
                     }
 
-                case GameKeys.Left:
+                case VirtualKeyCodes.VK_LEFT:
                     for (int row = 0; row < this.cube.GetLength(0); row++)
                     {
                         for (int column = 0; column < this.cube.GetLength(1); column++)
@@ -245,7 +245,7 @@ namespace TetrisGame.Tetris.Game
                         return false;
                     }
 
-                case GameKeys.Right:
+                case VirtualKeyCodes.VK_RIGHT:
                     for (int row = 0; row < this.cube.GetLength(0); row++)
                     {
                         for (int column = this.cube.GetLength(1) - 1; column >= 0; column--)

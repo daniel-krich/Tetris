@@ -32,12 +32,7 @@ namespace TetrisGame.Tetris.Display
             {
                 for (int column = 0; column < grid.GetGrid().GetLength(1); column++)
                 {
-                    if (grid.GetGrid()[row, column] == CellType.FixedCell)
-                    {
-                        Console.BackgroundColor = ConsoleColor.Gray;
-                        Console.Write("\x20\x20");
-                    }
-                    else if (grid.GetGrid()[row, column] == CellType.PlayerCell)
+                    if (grid.GetGrid()[row, column] != CellType.None)
                     {
                         Console.BackgroundColor = this.stats.LevelColor;
                         Console.Write("\x20\x20");

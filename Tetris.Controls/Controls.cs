@@ -11,17 +11,10 @@ namespace TetrisGame.Tetris.Controls
     using TetrisGame.Tetris.Game;
     using TetrisGame.Tetris.Display;
 
+    
     /// <summary>
     /// Key press codes
     /// </summary>
-    enum GameKeys
-    {
-        Left = 37,
-        Right = 39,
-        Down = 40,
-        Rotate_Key = 88
-    }
-
     enum VirtualKeyCodes
     {
         VK_DOWN	 = 0x28,
@@ -39,7 +32,7 @@ namespace TetrisGame.Tetris.Controls
         private Display display;
         private Stats stats;
 
-        private long PressDelay;
+        private Dictionary<VirtualKeyCodes, bool> PressMap;
         private long FallDelay;
 
         public Controls(Grid grid, Display display, Stats stats)
@@ -48,6 +41,12 @@ namespace TetrisGame.Tetris.Controls
             this.display = display;
             this.stats = stats;
 
+            this.PressMap = new Dictionary<VirtualKeyCodes, bool>() {
+                { VirtualKeyCodes.VK_DOWN, false },
+                { VirtualKeyCodes.VK_RIGHT, false },
+                { VirtualKeyCodes.VK_LEFT, false },
+                { VirtualKeyCodes.X_KEY, false },
+            };
             this.display.UpdateFrame();
         }
 
@@ -56,36 +55,26 @@ namespace TetrisGame.Tetris.Controls
         /// </summary>
         public void InputProcess()
         {
-            if (PressDelay < DateTime.Now.Ticks)
+            foreach (KeyValuePair<VirtualKeyCodes, bool> entry in this.PressMap)
             {
-                if ((GetKeyState((int)VirtualKeyCodes.VK_DOWN) & 0x8000) != 0)
+                if (GetKeyState((int)entry.Key) < 0 && !this.PressMap[entry.Key])
                 {
-                    this.grid.GetCurrentCube().Move(GameKeys.Down);
+                    if (entry.Key != VirtualKeyCodes.X_KEY)
+                        this.grid.GetCurrentCube().Move(entry.Key);
+                    else
+                        this.grid.GetCurrentCube().Rotate();
+
                     this.display.UpdateFrame();
-                    PressDelay = DateTime.Now.Ticks + 10000 * 50;
+                    this.PressMap[entry.Key] = true;
                 }
-                else if ((GetKeyState((int)VirtualKeyCodes.VK_RIGHT) & 0x8000) != 0)
+                else if(GetKeyState((int)entry.Key) >= 0 && this.PressMap[entry.Key])
                 {
-                    this.grid.GetCurrentCube().Move(GameKeys.Right);
-                    this.display.UpdateFrame();
-                    PressDelay = DateTime.Now.Ticks + 10000 * 50;
-                }
-                else if ((GetKeyState((int)VirtualKeyCodes.VK_LEFT) & 0x8000) != 0)
-                {
-                    this.grid.GetCurrentCube().Move(GameKeys.Left);
-                    this.display.UpdateFrame();
-                    PressDelay = DateTime.Now.Ticks + 10000 * 50;
-                }
-                else if ((GetKeyState((int)VirtualKeyCodes.X_KEY) & 0x8000) != 0)
-                {
-                    this.grid.GetCurrentCube().Rotate();
-                    this.display.UpdateFrame();
-                    PressDelay = DateTime.Now.Ticks + 10000 * 50;
+                    this.PressMap[entry.Key] = false;
                 }
             }
             if(FallDelay < DateTime.Now.Ticks)
             {
-                this.grid.GetCurrentCube().Move(GameKeys.Down);
+                this.grid.GetCurrentCube().Move(VirtualKeyCodes.VK_DOWN);
                 this.display.UpdateFrame();
                 FallDelay = DateTime.Now.Ticks + 10000 * this.stats.DelayLevel;
             }
