@@ -36,7 +36,7 @@ namespace TetrisGame.Tetris.Game
 
             Console.BackgroundColor = ConsoleColor.DarkMagenta;
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("\nGame Over! you scored {0} points\n", this.stats.GetScore());
+            Console.WriteLine("\nGame Over, structure got too high! you scored {0} points\n", this.stats.GetScore());
             Console.ResetColor();
         }
     }
