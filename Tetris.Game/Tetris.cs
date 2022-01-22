@@ -27,7 +27,7 @@ namespace TetrisGame.Tetris.Game
             this.stats = new Stats();
             this.grid = new Grid(rows, columns, this.stats);
             this.display = new Display(this.grid, this.stats);
-            this.controls = new Controls(this.grid, this.display);
+            this.controls = new Controls(this.grid, this.display, this.stats);
 
             while(grid.UpdateGame())
             {
@@ -36,7 +36,7 @@ namespace TetrisGame.Tetris.Game
 
             Console.BackgroundColor = ConsoleColor.DarkMagenta;
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("\nGame Over, structure got too high! you scored {0} points\n", this.stats.GetScore());
+            Console.WriteLine("\nGame Over, structure got too high! you scored {0} points\n", this.stats.Score);
             Console.ResetColor();
         }
     }

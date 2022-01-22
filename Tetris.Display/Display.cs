@@ -39,7 +39,7 @@ namespace TetrisGame.Tetris.Display
                     }
                     else if (grid.GetGrid()[row, column] == CellType.PlayerCell)
                     {
-                        Console.BackgroundColor = ConsoleColor.DarkCyan;
+                        Console.BackgroundColor = this.stats.LevelColor;
                         Console.Write("\x20\x20");
                     }
                     else
@@ -70,10 +70,19 @@ namespace TetrisGame.Tetris.Display
         /// </summary>
         public void DisplayScore()
         {
-            Console.BackgroundColor = ConsoleColor.DarkYellow;
+            Console.BackgroundColor = this.stats.LevelColor;
             Console.ForegroundColor = ConsoleColor.Black;
-            string score = "Score: "+ this.stats.GetScore() + " points";
+            string level = "Level: " + this.stats.LevelName;
+            Console.Write(level);
 
+            for (int i = 0; i < this.grid.GetGrid().GetLength(1) * 2 - level.Length; i++)
+            {
+                Console.Write("\x20");
+            }
+            Console.WriteLine();
+
+            //
+            string score = "Score: "+ this.stats.Score + " points";
             Console.Write(score);
 
             for(int i = 0; i < this.grid.GetGrid().GetLength(1)*2 - score.Length; i++)

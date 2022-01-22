@@ -185,7 +185,7 @@ namespace TetrisGame.Tetris.Game
                                 else
                                 {
                                     this.cube = localClone;
-                                    this.stats.AddScore(5);
+                                    this.stats.Score += 5;
                                     this.grid.ConvertAllPlayerCellToFixed();
                                     this.grid.CreateNewPlayerCube();
                                     return false;
@@ -195,7 +195,7 @@ namespace TetrisGame.Tetris.Game
                     }
                     if (this.grid.isMergeSafe(this) && !cloneMove)
                     {
-                        this.stats.AddScore(1);
+                        this.stats.Score += 1;
                         this.grid.Merge(this);
                         Move(key, !cloneMove);
                         return true;
@@ -208,7 +208,7 @@ namespace TetrisGame.Tetris.Game
                     else
                     {
                         this.cube = localClone;
-                        this.stats.AddScore(5);
+                        this.stats.Score += 5;
                         this.grid.ConvertAllPlayerCellToFixed();
                         this.grid.CreateNewPlayerCube();
                         return false;

@@ -181,7 +181,7 @@ namespace TetrisGame.Tetris.Game
 
                 if (fullCount >= this.gridTable.GetLength(1))
                 {
-                    this.stats.AddScore(this.gridTable.GetLength(1));
+                    this.stats.Score += this.gridTable.GetLength(1);
 
                     for (int column = 0; column < this.gridTable.GetLength(1); column++)
                     {
