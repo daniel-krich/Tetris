@@ -62,7 +62,16 @@ namespace TetrisGame.Tetris.Display
         {
             Console.BackgroundColor = ConsoleColor.DarkYellow;
             Console.ForegroundColor = ConsoleColor.Black;
-            Console.WriteLine("Score: {0} points", this.stats.GetScore());
+            string score = "Score: "+ this.stats.GetScore() + " points";
+
+            Console.Write(score);
+
+            for(int i = 0; i < this.grid.GetGrid().GetLength(1)*2 - score.Length; i++)
+            {
+                Console.Write("\x20");
+            }
+            Console.WriteLine();
+
             Console.ResetColor();
         }
     }
