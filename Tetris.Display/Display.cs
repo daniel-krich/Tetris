@@ -10,16 +10,19 @@ namespace TetrisGame.Tetris.Display
     class Display
     {
         private Grid grid;
+        private Stats stats;
 
-        public Display(Grid grid)
+        public Display(Grid grid, Stats stats)
         {
             this.grid = grid;
+            this.stats = stats;
         }
 
         public void UpdateFrame()
         {
             Console.Clear();
             DisplayControls();
+            DisplayScore();
             //
             for (int row = 0; row < grid.GetGrid().GetLength(0); row++)
             {
@@ -52,6 +55,14 @@ namespace TetrisGame.Tetris.Display
             Console.ForegroundColor = ConsoleColor.Black;
             Console.WriteLine("Use \"Left\", \"Right\", \"Down\" buttons to control the shape.");
             Console.WriteLine("Use \"X\" to flip the shape\n");
+            Console.ResetColor();
+        }
+
+        public void DisplayScore()
+        {
+            Console.BackgroundColor = ConsoleColor.DarkYellow;
+            Console.ForegroundColor = ConsoleColor.Black;
+            Console.WriteLine("Score: {0} points", this.stats.GetScore());
             Console.ResetColor();
         }
     }

@@ -15,28 +15,24 @@ namespace TetrisGame.Tetris.Game
         private Grid grid { get; set; }
         private Display display { get; set; }
         private Controls controls { get; set; }
+        private Stats stats { get; set; }
 
         public void Run(int rows, int columns)
         {
-            this.grid = new Grid(rows, columns);
-            this.display = new Display(this.grid);
+            this.stats = new Stats();
+            this.grid = new Grid(rows, columns, this.stats);
+            this.display = new Display(this.grid, this.stats);
             this.controls = new Controls(this.grid, this.display);
 
             while(grid.UpdateGame())
             {
-                Thread.Sleep(1);
+                this.controls.InputProcess();
             }
 
-            this.controls.isFinished = true;
-
-        WaitForThreadToFinish:
-            if (this.controls.currentThread.IsAlive)
-                goto WaitForThreadToFinish;
-
-            Console.BackgroundColor = ConsoleColor.Black;
+            Console.BackgroundColor = ConsoleColor.DarkMagenta;
             Console.ForegroundColor = ConsoleColor.White;
-            Console.Clear();
-            Console.WriteLine("Game is finished...");
+            Console.WriteLine("\nGame Over! you scored {0} points\n", this.stats.GetScore());
+            Console.ResetColor();
         }
     }
 }

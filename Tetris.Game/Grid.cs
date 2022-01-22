@@ -19,15 +19,14 @@ namespace TetrisGame.Tetris.Game
 
         private Cube currentCube { get; set; }
 
-        public Grid(int rows, int columns)
+        private Stats stats { get; set; }
+
+        public Grid(int rows, int columns, Stats stats)
         {
             this.gridTable = new CellType[rows, columns];
-            this.currentCube = new Cube(this, this.gridTable.GetLength(0), this.gridTable.GetLength(1));
-            //IntergrateCube(this.currentCube);
-            if(isMergeSafe(this.currentCube))
-            {
-                Merge(this.currentCube);
-            }
+            this.stats = stats;
+
+            CreateNewPlayerCube();
         }
 
         public void IntergrateCube(Cube cube)
@@ -103,7 +102,7 @@ namespace TetrisGame.Tetris.Game
 
         public void CreateNewPlayerCube()
         {
-            this.currentCube = new Cube(this, this.gridTable.GetLength(0), this.gridTable.GetLength(1));
+            this.currentCube = new Cube(this, this.gridTable.GetLength(0), this.gridTable.GetLength(1), this.stats);
             if (isMergeSafe(this.currentCube))
             {
                 Merge(this.currentCube);
@@ -156,6 +155,8 @@ namespace TetrisGame.Tetris.Game
 
                 if (fullCount >= this.gridTable.GetLength(1))
                 {
+                    this.stats.AddScore(this.gridTable.GetLength(1));
+
                     for (int column = 0; column < this.gridTable.GetLength(1); column++)
                     {
                         this.gridTable[row, column] = CellType.None;

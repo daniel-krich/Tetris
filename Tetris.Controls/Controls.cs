@@ -23,36 +23,27 @@ namespace TetrisGame.Tetris.Controls
         private Grid grid;
         private Display display;
 
-        public Thread currentThread;
-        public bool isFinished;
-
         public Controls(Grid grid, Display display)
         {
             this.grid = grid;
             this.display = display;
 
             this.display.UpdateFrame();
-
-            this.currentThread = new Thread(InputProcess);
-            this.currentThread.Start();
         }
 
-        private void InputProcess()
+        public void InputProcess()
         {
-            while(!this.isFinished)
+            GameKeys currentKey = (GameKeys)Console.ReadKey(false).Key;
+            if (currentKey == GameKeys.Down || currentKey == GameKeys.Left || currentKey == GameKeys.Right)
             {
-                GameKeys currentKey = (GameKeys)Console.ReadKey(false).Key;
-                if (currentKey == GameKeys.Down || currentKey == GameKeys.Left || currentKey == GameKeys.Right)
-                {
-                    this.grid.GetCurrentCube().Move(currentKey);
-                    this.display.UpdateFrame();
-                }
-                else if(currentKey == GameKeys.Rotate_Key)
-                {
-                    this.grid.GetCurrentCube().Rotate();
-                    this.display.UpdateFrame();
-                }
+                this.grid.GetCurrentCube().Move(currentKey);
+                this.display.UpdateFrame();
             }
-        }
+            else if(currentKey == GameKeys.Rotate_Key)
+            {
+                this.grid.GetCurrentCube().Rotate();
+                this.display.UpdateFrame();
+            }
+    }
     }
 }

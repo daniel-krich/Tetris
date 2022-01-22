@@ -27,14 +27,16 @@ namespace TetrisGame.Tetris.Game
         public CubeType type { get; set; }
 
         private Grid grid { get; set; }
+        private Stats stats { get; set; }
 
         private int rows, columns;
 
-        public Cube(Grid grid, int rows, int columns)
+        public Cube(Grid grid, int rows, int columns, Stats stats)
         {
             this.grid = grid;
             this.rows = rows;
             this.columns = columns;
+            this.stats = stats;
             //
             var (CubeMatrix, CubeMartixType) = RandomCube();
             this.cube = CubeMatrix;
@@ -121,12 +123,14 @@ namespace TetrisGame.Tetris.Game
                 }
             }
 
-            if (maxRowVal + (maxRowVal - minRowVal) < this.cube.GetLength(0))
-            {
+            
 
-                for (int row = maxRowVal, offset = 0; row >= minRowVal; row--, offset++)
+            for (int row = maxRowVal, offset = 0; row >= minRowVal; row--, offset++)
+            {
+                for (int column = 0; column < this.cube.GetLength(1); column++)
                 {
-                    for (int column = 0; column < this.cube.GetLength(1); column++)
+                    if (minRowVal + offset - (maxRowVal - minRowVal) >= 0 &&
+                        maxRowVal - offset + (maxRowVal - minRowVal) < this.cube.GetLength(0))
                     {
                         CellType swap = this.cube[maxRowVal - offset + (maxRowVal - minRowVal), column];
                         this.cube[maxRowVal - offset + (maxRowVal - minRowVal), column] = this.cube[minRowVal + offset - (maxRowVal - minRowVal), column];
@@ -134,6 +138,7 @@ namespace TetrisGame.Tetris.Game
                     }
                 }
             }
+            
 
 
             if (this.grid.isMergeSafe(this))
@@ -163,6 +168,7 @@ namespace TetrisGame.Tetris.Game
                                 else
                                 {
                                     this.cube = localClone;
+                                    this.stats.AddScore(5);
                                     this.grid.ConvertAllPlayerCellToFixed();
                                     this.grid.CreateNewPlayerCube();
                                     return false;
@@ -172,6 +178,7 @@ namespace TetrisGame.Tetris.Game
                     }
                     if (this.grid.isMergeSafe(this) && !cloneMove)
                     {
+                        this.stats.AddScore(1);
                         this.grid.Merge(this);
                         Move(key, !cloneMove);
                         return true;
@@ -184,6 +191,7 @@ namespace TetrisGame.Tetris.Game
                     else
                     {
                         this.cube = localClone;
+                        this.stats.AddScore(5);
                         this.grid.ConvertAllPlayerCellToFixed();
                         this.grid.CreateNewPlayerCube();
                         return false;
