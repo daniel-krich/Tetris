@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 namespace TetrisGame.Tetris.Game
 {
     using TetrisGame.Tetris.Controls;
+
+    /// <summary>
+    /// Cube type enum
+    /// </summary>
     enum CubeType
     {
         l_shape,
@@ -43,6 +47,10 @@ namespace TetrisGame.Tetris.Game
             this.type = CubeMartixType;
         }
 
+        /// <summary>
+        /// Generates a random shaped cube
+        /// </summary>
+        /// <returns>Tuple of a new 2D array where only the shape exists, and current shape type</returns>
         public (CellType[,], CubeType) RandomCube()
         {
             CellType[,] randCube = new CellType[this.rows, this.columns];
@@ -105,6 +113,9 @@ namespace TetrisGame.Tetris.Game
             return (randCube, randType);
         }
 
+        /// <summary>
+        /// Rotates the shape 180 degrees each call.
+        /// </summary>
         public void Rotate()
         {
             CellType[,] localClone = this.cube.Clone() as CellType[,];
@@ -148,6 +159,12 @@ namespace TetrisGame.Tetris.Game
         }
 
 
+        /// <summary>
+        /// Moves the shape Left/Right/Down on the grid.
+        /// </summary>
+        /// <param name="key">GameKeys enum (Down, Left, Right, X)</param>
+        /// <param name="cloneMove">used to predict if the next move is a dead end</param>
+        /// <returns>false if can't move that direction, or true otherwise.</returns>
         public bool Move(GameKeys key, bool cloneMove = false)
         {
             CellType[,] localClone = this.cube.Clone() as CellType[,];
@@ -264,6 +281,10 @@ namespace TetrisGame.Tetris.Game
             }
         }
 
+        /// <summary>
+        /// The sum of the shape, block count.
+        /// </summary>
+        /// <returns></returns>
         public int GetActiveBlocks()
         {
             int activeBlocks = 0;
@@ -275,6 +296,10 @@ namespace TetrisGame.Tetris.Game
             return activeBlocks;
         }
 
+        /// <summary>
+        /// Get cube/shape instance
+        /// </summary>
+        /// <returns></returns>
         public CellType[,] GetCube() => this.cube;
     }
 }

@@ -15,11 +15,19 @@ namespace TetrisGame.Tetris.Game
             this.score = 0;
         }
 
+        /// <summary>
+        /// Add score to the stats
+        /// </summary>
+        /// <param name="score"></param>
         public void AddScore(int score)
         {
             this.score += score;
         }
 
+        /// <summary>
+        /// Get score
+        /// </summary>
+        /// <returns></returns>
         public int GetScore() => this.score;
     }
 }

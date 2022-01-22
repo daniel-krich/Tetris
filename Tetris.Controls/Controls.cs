@@ -10,6 +10,9 @@ namespace TetrisGame.Tetris.Controls
     using TetrisGame.Tetris.Game;
     using TetrisGame.Tetris.Display;
 
+    /// <summary>
+    /// Key press codes
+    /// </summary>
     enum GameKeys
     {
         Left = 37,
@@ -31,6 +34,9 @@ namespace TetrisGame.Tetris.Controls
             this.display.UpdateFrame();
         }
 
+        /// <summary>
+        /// Processes the key presses and moving/rotating the shape
+        /// </summary>
         public void InputProcess()
         {
             GameKeys currentKey = (GameKeys)Console.ReadKey(false).Key;

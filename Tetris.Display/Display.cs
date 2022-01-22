@@ -18,6 +18,10 @@ namespace TetrisGame.Tetris.Display
             this.stats = stats;
         }
 
+        /// <summary>
+        /// Updates the frame of the console to the current 2D martix of the grid and the cubes.
+        /// Updates the score and controls.
+        /// </summary>
         public void UpdateFrame()
         {
             Console.Clear();
@@ -49,6 +53,9 @@ namespace TetrisGame.Tetris.Display
             }
         }
 
+        /// <summary>
+        /// Displays the controls to the console
+        /// </summary>
         public void DisplayControls()
         {
             Console.BackgroundColor = ConsoleColor.DarkYellow;
@@ -58,6 +65,9 @@ namespace TetrisGame.Tetris.Display
             Console.ResetColor();
         }
 
+        /// <summary>
+        /// Displays the current score to the console
+        /// </summary>
         public void DisplayScore()
         {
             Console.BackgroundColor = ConsoleColor.DarkYellow;

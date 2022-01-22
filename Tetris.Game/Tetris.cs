@@ -17,6 +17,11 @@ namespace TetrisGame.Tetris.Game
         private Controls controls { get; set; }
         private Stats stats { get; set; }
 
+        /// <summary>
+        /// Main function to run the game fully.
+        /// </summary>
+        /// <param name="rows"></param>
+        /// <param name="columns"></param>
         public void Run(int rows, int columns)
         {
             this.stats = new Stats();

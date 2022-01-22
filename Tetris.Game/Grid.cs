@@ -6,6 +6,11 @@ using System.Threading.Tasks;
 
 namespace TetrisGame.Tetris.Game
 {
+    /// <summary>
+    /// None = empty cell.
+    /// FixedCell = occupied cell, non controllable.
+    /// PlayerCell = temporary occupied cell, controllable by the player.
+    /// </summary>
     enum CellType
     {
         None,
@@ -29,20 +34,9 @@ namespace TetrisGame.Tetris.Game
             CreateNewPlayerCube();
         }
 
-        public void IntergrateCube(Cube cube)
-        {
-            for (int row = 0; row < cube.GetCube().GetLength(0); row++)
-            {
-                for (int column = 0; column < cube.GetCube().GetLength(1); column++)
-                {
-                    if (cube.GetCube()[row, column] != CellType.None)
-                    {
-                        this.gridTable[row, column + gridTable.GetLength(1) / 2] = cube.GetCube()[row, column];
-                    }
-                }
-            }
-        }
-
+        /// <summary>
+        /// Clears all the CellType.PlayerCell from the grid
+        /// </summary>
         public void ClearPlayerCubeFromGrid()
         {
             for (int row = 0; row < this.gridTable.GetLength(0); row++)
@@ -55,6 +49,10 @@ namespace TetrisGame.Tetris.Game
             }
         }
 
+        /// <summary>
+        /// Checks if the game finished or player lost.
+        /// </summary>
+        /// <returns>True if game still going, False if finished.</returns>
         public bool UpdateGame()
         {
             if (isGameFinished())
@@ -64,6 +62,10 @@ namespace TetrisGame.Tetris.Game
             return true;
         }
 
+        /// <summary>
+        /// Checks if the game finished or player lost.
+        /// </summary>
+        /// <returns></returns>
         public bool isGameFinished()
         {
             for (int column = 0; column < this.gridTable.GetLength(1); column++)
@@ -75,6 +77,10 @@ namespace TetrisGame.Tetris.Game
             return false;
         }
 
+        /// <summary>
+        /// Count all occupied blocks of the grid.
+        /// </summary>
+        /// <returns></returns>
         public int GetActiveBlocks()
         {
             int activeBlocks = 0;
@@ -86,6 +92,11 @@ namespace TetrisGame.Tetris.Game
             return activeBlocks;
         }
 
+        /// <summary>
+        /// Checks if Shape grid and the game grid can merge safely without any cell loss or overrides.
+        /// </summary>
+        /// <param name="cube">Cube instance</param>
+        /// <returns>True if safe, False otherwise</returns>
         public bool isMergeSafe(Cube cube)
         {
             for (int row = 0; row < cube.GetCube().GetLength(0); row++)
@@ -100,6 +111,9 @@ namespace TetrisGame.Tetris.Game
             return true;
         }
 
+        /// <summary>
+        /// Creates a new instance of a random player shape
+        /// </summary>
         public void CreateNewPlayerCube()
         {
             this.currentCube = new Cube(this, this.gridTable.GetLength(0), this.gridTable.GetLength(1), this.stats);
@@ -109,6 +123,10 @@ namespace TetrisGame.Tetris.Game
             }
         }
 
+        /// <summary>
+        /// Merges 2 grids together
+        /// </summary>
+        /// <param name="cube">Cube instance</param>
         public void Merge(Cube cube)
         {
             ClearPlayerCubeFromGrid();
@@ -128,6 +146,9 @@ namespace TetrisGame.Tetris.Game
             }
         }
 
+        /// <summary>
+        /// Takes CellType.PlayerCell and turns it into CellType.FixedCell
+        /// </summary>
         public void ConvertAllPlayerCellToFixed()
         {
             for (int row = 0; row < this.gridTable.GetLength(0); row++)
@@ -140,6 +161,11 @@ namespace TetrisGame.Tetris.Game
             }
         }
 
+
+        /// <summary>
+        /// Wipes all the full rows
+        /// </summary>
+        /// <returns>True if wiped some rows, False otherwise</returns>
         public bool WipeOutFullRows()
         {
             for (int row = 0; row < this.gridTable.GetLength(0); row++)
@@ -167,6 +193,9 @@ namespace TetrisGame.Tetris.Game
             return false;
         }
 
+        /// <summary>
+        /// Make all the cleared rows to collapse down and avoid ghost rows.
+        /// </summary>
         public void CollapsFixedCells()
         {
             for (int row = this.gridTable.GetLength(0) - 1; row >= 0; row--)
@@ -189,8 +218,16 @@ namespace TetrisGame.Tetris.Game
             }
         }
 
+        /// <summary>
+        /// Gets the grid or 2D array instance
+        /// </summary>
+        /// <returns>2D array instance</returns>
         public CellType[,] GetGrid() => this.gridTable;
 
+        /// <summary>
+        /// Get the current cube instance
+        /// </summary>
+        /// <returns>Cube instance</returns>
         public Cube GetCurrentCube() => this.currentCube;
 
     }
