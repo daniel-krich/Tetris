@@ -4,9 +4,10 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TetrisGame.GameLogic;
+using TetrisGame.Logic;
 using TetrisGame.UI;
 using TetrisGame.Models;
+using TetrisGame.ILogic;
 
 namespace TetrisGame.Core
 {

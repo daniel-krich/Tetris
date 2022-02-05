@@ -5,16 +5,18 @@ using System.Text;
 using System.Threading.Tasks;
 using TetrisGame.Core;
 using TetrisGame.Enums;
+using TetrisGame.ILogic;
 using TetrisGame.Models;
 
-namespace TetrisGame.GameLogic
+namespace TetrisGame.Logic
 {
 
     public class Cube : ICube
     {
-        public CellType[,] cube { get; set; }
 
-        public CubeType type { get; set; }
+        public CubeType CubeType { get; set; }
+
+        public CellType[,] CurrentCube { get; set; }
 
         private ITetris _tetris;
         private IGrid _grid;
@@ -25,17 +27,20 @@ namespace TetrisGame.GameLogic
             _tetris = tetris;
             _grid = grid;
             _statsModel = statsModel;
-            //
+        }
+
+        public void RecreateCube()
+        {
             var (CubeMatrix, CubeMartixType) = RandomCube();
-            this.cube = CubeMatrix;
-            this.type = CubeMartixType;
+            CurrentCube = CubeMatrix;
+            CubeType = CubeMartixType;
         }
 
         /// <summary>
         /// Generates a random shaped cube
         /// </summary>
         /// <returns>Tuple of a new 2D array where only the shape exists, and current shape type</returns>
-        public (CellType[,], CubeType) RandomCube()
+        private (CellType[,], CubeType) RandomCube()
         {
             CellType[,] randCube = new CellType[_tetris.Rows, _tetris.Columns];
             CubeType randType = 0;
@@ -102,14 +107,14 @@ namespace TetrisGame.GameLogic
         /// </summary>
         public void Rotate()
         {
-            CellType[,] localClone = this.cube.Clone() as CellType[,];
+            CellType[,] localClone = CurrentCube.Clone() as CellType[,];
             int maxRowVal = 0;
             int minRowVal = 0;
-            for (int row = 0; row < this.cube.GetLength(0); row++)
+            for (int row = 0; row < CurrentCube.GetLength(0); row++)
             {
-                for (int column = 0; column < this.cube.GetLength(1); column++)
+                for (int column = 0; column < CurrentCube.GetLength(1); column++)
                 {
-                    if (this.cube[row, column] == CellType.PlayerCell)
+                    if (CurrentCube[row, column] == CellType.PlayerCell)
                     {
                         if (minRowVal == 0)
                             minRowVal = row;
@@ -122,14 +127,14 @@ namespace TetrisGame.GameLogic
 
             for (int row = maxRowVal, offset = 0; row >= minRowVal; row--, offset++)
             {
-                for (int column = 0; column < this.cube.GetLength(1); column++)
+                for (int column = 0; column < CurrentCube.GetLength(1); column++)
                 {
                     if (minRowVal + offset - (maxRowVal - minRowVal) >= 0 &&
-                        maxRowVal - offset + (maxRowVal - minRowVal) < this.cube.GetLength(0))
+                        maxRowVal - offset + (maxRowVal - minRowVal) < CurrentCube.GetLength(0))
                     {
-                        CellType swap = this.cube[maxRowVal - offset + (maxRowVal - minRowVal), column];
-                        this.cube[maxRowVal - offset + (maxRowVal - minRowVal), column] = this.cube[minRowVal + offset - (maxRowVal - minRowVal), column];
-                        this.cube[minRowVal + offset - (maxRowVal - minRowVal), column] = swap;
+                        CellType swap = CurrentCube[maxRowVal - offset + (maxRowVal - minRowVal), column];
+                        CurrentCube[maxRowVal - offset + (maxRowVal - minRowVal), column] = CurrentCube[minRowVal + offset - (maxRowVal - minRowVal), column];
+                        CurrentCube[minRowVal + offset - (maxRowVal - minRowVal), column] = swap;
                     }
                 }
             }
@@ -139,7 +144,7 @@ namespace TetrisGame.GameLogic
             if (_grid.isMergeSafe(this))
                 _grid.Merge(this);
             else
-                this.cube = localClone;
+                CurrentCube = localClone;
         }
 
 
@@ -151,24 +156,24 @@ namespace TetrisGame.GameLogic
         /// <returns>false if can't move that direction, or true otherwise.</returns>
         public bool Move(VirtualKeyCodes key, bool cloneMove = false)
         {
-            CellType[,] localClone = this.cube.Clone() as CellType[,];
+            CellType[,] localClone = CurrentCube.Clone() as CellType[,];
             switch (key)
             {
                 case VirtualKeyCodes.VK_DOWN:
-                    for (int row = this.cube.GetLength(0) - 1; row >= 0; row--)
+                    for (int row = CurrentCube.GetLength(0) - 1; row >= 0; row--)
                     {
-                        for (int column = 0; column < this.cube.GetLength(1); column++)
+                        for (int column = 0; column < CurrentCube.GetLength(1); column++)
                         {
-                            if (this.cube[row, column] == CellType.PlayerCell)
+                            if (CurrentCube[row, column] == CellType.PlayerCell)
                             {
-                                if (row < this.cube.GetLength(0) - 1)
+                                if (row < CurrentCube.GetLength(0) - 1)
                                 {
-                                    this.cube[row, column] = CellType.None;
-                                    this.cube[row + 1, column] = CellType.PlayerCell;
+                                    CurrentCube[row, column] = CellType.None;
+                                    CurrentCube[row + 1, column] = CellType.PlayerCell;
                                 }
                                 else
                                 {
-                                    this.cube = localClone;
+                                    CurrentCube = localClone;
                                     _statsModel.Score += 5;
                                     _grid.ConvertAllPlayerCellToFixed();
                                     _grid.CreateNewPlayerCube();
@@ -186,12 +191,12 @@ namespace TetrisGame.GameLogic
                     }
                     else if (_grid.isMergeSafe(this) && cloneMove)
                     {
-                        this.cube = localClone;
+                        CurrentCube = localClone;
                         return false;
                     }
                     else
                     {
-                        this.cube = localClone;
+                        CurrentCube = localClone;
                         _statsModel.Score += 5;
                         _grid.ConvertAllPlayerCellToFixed();
                         _grid.CreateNewPlayerCube();
@@ -199,20 +204,20 @@ namespace TetrisGame.GameLogic
                     }
 
                 case VirtualKeyCodes.VK_LEFT:
-                    for (int row = 0; row < this.cube.GetLength(0); row++)
+                    for (int row = 0; row < CurrentCube.GetLength(0); row++)
                     {
-                        for (int column = 0; column < this.cube.GetLength(1); column++)
+                        for (int column = 0; column < CurrentCube.GetLength(1); column++)
                         {
-                            if (this.cube[row, column] == CellType.PlayerCell)
+                            if (CurrentCube[row, column] == CellType.PlayerCell)
                             {
                                 if (column > 0)
                                 {
-                                    this.cube[row, column] = CellType.None;
-                                    this.cube[row, column - 1] = CellType.PlayerCell;
+                                    CurrentCube[row, column] = CellType.None;
+                                    CurrentCube[row, column - 1] = CellType.PlayerCell;
                                 }
                                 else
                                 {
-                                    this.cube = localClone;
+                                    CurrentCube = localClone;
                                     return false;
                                 }
                             }
@@ -225,25 +230,25 @@ namespace TetrisGame.GameLogic
                     }
                     else
                     {
-                        this.cube = localClone;
+                        CurrentCube = localClone;
                         return false;
                     }
 
                 case VirtualKeyCodes.VK_RIGHT:
-                    for (int row = 0; row < this.cube.GetLength(0); row++)
+                    for (int row = 0; row < CurrentCube.GetLength(0); row++)
                     {
-                        for (int column = this.cube.GetLength(1) - 1; column >= 0; column--)
+                        for (int column = CurrentCube.GetLength(1) - 1; column >= 0; column--)
                         {
-                            if (this.cube[row, column] == CellType.PlayerCell)
+                            if (CurrentCube[row, column] == CellType.PlayerCell)
                             {
-                                if (column < this.cube.GetLength(1) - 1)
+                                if (column < CurrentCube.GetLength(1) - 1)
                                 {
-                                    this.cube[row, column] = CellType.None;
-                                    this.cube[row, column + 1] = CellType.PlayerCell;
+                                    CurrentCube[row, column] = CellType.None;
+                                    CurrentCube[row, column + 1] = CellType.PlayerCell;
                                 }
                                 else
                                 {
-                                    this.cube = localClone;
+                                    CurrentCube = localClone;
                                     return false;
                                 }
                             }
@@ -256,7 +261,7 @@ namespace TetrisGame.GameLogic
                     }
                     else
                     {
-                        this.cube = localClone;
+                        CurrentCube = localClone;
                         return false;
                     }
 
@@ -264,26 +269,5 @@ namespace TetrisGame.GameLogic
                     return false;
             }
         }
-
-        /// <summary>
-        /// The sum of the shape, block count.
-        /// </summary>
-        /// <returns></returns>
-        public int GetActiveBlocks()
-        {
-            int activeBlocks = 0;
-
-            foreach (CellType Cell in this.cube)
-                if (Cell != CellType.None)
-                    activeBlocks++;
-
-            return activeBlocks;
-        }
-
-        /// <summary>
-        /// Get cube/shape instance
-        /// </summary>
-        /// <returns></returns>
-        public CellType[,] GetCube() => this.cube;
     }
 }

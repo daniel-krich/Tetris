@@ -1,4 +1,4 @@
-﻿namespace TetrisGame.GameLogic
+﻿namespace TetrisGame.ILogic
 {
     public interface IControls
     {

@@ -7,16 +7,21 @@ using System.Threading.Tasks;
 using TetrisGame.Enums;
 using TetrisGame.Models;
 using TetrisGame.Core;
+using TetrisGame.ILogic;
 
-namespace TetrisGame.GameLogic
+namespace TetrisGame.Logic
 {
     class Grid : IGrid
     {
         private CellType[,] _gridTable;
 
-        private Cube _currentCube;
+        private ICube _cube;
 
         private IStatsModel _statsModel;
+
+        public CellType[,] CurrentGrid { get => _gridTable; }
+
+        public Cube CurrentCube { get => _cube as Cube; }
 
         public Grid(IStatsModel statsModel)
         {
@@ -32,7 +37,7 @@ namespace TetrisGame.GameLogic
         /// <summary>
         /// Clears all the CellType.PlayerCell from the grid
         /// </summary>
-        public void ClearPlayerCubeFromGrid()
+        private void ClearPlayerCubeFromGrid()
         {
             for (int row = 0; row < _gridTable.GetLength(0); row++)
             {
@@ -52,7 +57,7 @@ namespace TetrisGame.GameLogic
         {
             if (isGameFinished())
                 return false;
-            if (!isMergeSafe(_currentCube))
+            if (!isMergeSafe(_cube as Cube))
                 return false;
             return true;
         }
@@ -73,32 +78,17 @@ namespace TetrisGame.GameLogic
         }
 
         /// <summary>
-        /// Count all occupied blocks of the grid.
-        /// </summary>
-        /// <returns></returns>
-        public int GetActiveBlocks()
-        {
-            int activeBlocks = 0;
-
-            foreach (CellType Cell in _gridTable)
-                if (Cell != CellType.None)
-                    activeBlocks++;
-
-            return activeBlocks;
-        }
-
-        /// <summary>
         /// Checks if Shape grid and the game grid can merge safely without any cell loss or overrides.
         /// </summary>
         /// <param name="cube">Cube instance</param>
         /// <returns>True if safe, False otherwise</returns>
         public bool isMergeSafe(Cube cube)
         {
-            for (int row = 0; row < cube.GetCube().GetLength(0); row++)
+            for (int row = 0; row < cube.CurrentCube.GetLength(0); row++)
             {
-                for (int column = 0; column < cube.GetCube().GetLength(1); column++)
+                for (int column = 0; column < cube.CurrentCube.GetLength(1); column++)
                 {
-                    if (cube.GetCube()[row, column] != CellType.None && _gridTable[row, column] == CellType.FixedCell)
+                    if (cube.CurrentCube[row, column] != CellType.None && _gridTable[row, column] == CellType.FixedCell)
                         return false;
                 }
             }
@@ -111,10 +101,13 @@ namespace TetrisGame.GameLogic
         /// </summary>
         public void CreateNewPlayerCube()
         {
-            _currentCube = AppServices.ServiceProvider.GetRequiredService<ICube>() as Cube;
-            if (isMergeSafe(_currentCube))
+            if (_cube is null)
+                _cube = AppServices.ServiceProvider.GetRequiredService<ICube>();
+
+            _cube.RecreateCube();
+            if (isMergeSafe(_cube as Cube))
             {
-                Merge(_currentCube);
+                Merge(_cube as Cube);
             }
         }
 
@@ -129,13 +122,13 @@ namespace TetrisGame.GameLogic
             while (WipeOutFullRows())
                 CollapsFixedCells();
 
-            for (int row = 0; row < cube.GetCube().GetLength(0); row++)
+            for (int row = 0; row < cube.CurrentCube.GetLength(0); row++)
             {
-                for (int column = 0; column < cube.GetCube().GetLength(1); column++)
+                for (int column = 0; column < cube.CurrentCube.GetLength(1); column++)
                 {
-                    if (cube.GetCube()[row, column] != CellType.None)
+                    if (cube.CurrentCube[row, column] != CellType.None)
                     {
-                        _gridTable[row, column] = cube.GetCube()[row, column];
+                        _gridTable[row, column] = cube.CurrentCube[row, column];
                     }
                 }
             }
@@ -161,7 +154,7 @@ namespace TetrisGame.GameLogic
         /// Wipes all the full rows
         /// </summary>
         /// <returns>True if wiped some rows, False otherwise</returns>
-        public bool WipeOutFullRows()
+        private bool WipeOutFullRows()
         {
             for (int row = 0; row < _gridTable.GetLength(0); row++)
             {
@@ -191,7 +184,7 @@ namespace TetrisGame.GameLogic
         /// <summary>
         /// Make all the cleared rows to collapse down and avoid ghost rows.
         /// </summary>
-        public void CollapsFixedCells()
+        private void CollapsFixedCells()
         {
             for (int row = _gridTable.GetLength(0) - 1; row >= 0; row--)
             {
@@ -212,18 +205,5 @@ namespace TetrisGame.GameLogic
                 }
             }
         }
-
-        /// <summary>
-        /// Gets the grid or 2D array instance
-        /// </summary>
-        /// <returns>2D array instance</returns>
-        public CellType[,] GetGrid() => _gridTable;
-
-        /// <summary>
-        /// Get the current cube instance
-        /// </summary>
-        /// <returns>Cube instance</returns>
-        public Cube GetCurrentCube() => _currentCube;
-
     }
 }

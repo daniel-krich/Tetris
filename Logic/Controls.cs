@@ -9,8 +9,9 @@ using TetrisGame.Enums;
 using TetrisGame.Models;
 using TetrisGame.UI;
 using TetrisGame.Core;
+using TetrisGame.ILogic;
 
-namespace TetrisGame.GameLogic
+namespace TetrisGame.Logic
 {
     public class Controls : IControls
     {
@@ -46,9 +47,9 @@ namespace TetrisGame.GameLogic
                 if (Utils.GetKeyState((int)entry.Key) < 0 && !_pressMap[entry.Key])
                 {
                     if (entry.Key != VirtualKeyCodes.X_KEY)
-                        _grid.GetCurrentCube().Move(entry.Key);
+                        _grid.CurrentCube.Move(entry.Key);
                     else
-                        _grid.GetCurrentCube().Rotate();
+                        _grid.CurrentCube.Rotate();
 
                     _display.UpdateFrame();
                     _pressMap[entry.Key] = true;
@@ -60,7 +61,7 @@ namespace TetrisGame.GameLogic
             }
             if (FallDelay < DateTime.Now.Ticks)
             {
-                _grid.GetCurrentCube().Move(VirtualKeyCodes.VK_DOWN);
+                _grid.CurrentCube.Move(VirtualKeyCodes.VK_DOWN);
                 _display.UpdateFrame();
                 FallDelay = DateTime.Now.Ticks + 10000 * _statsModel.DelayLevel;
             }

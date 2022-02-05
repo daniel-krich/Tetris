@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 using System.Threading;
 using TetrisGame.UI;
 using TetrisGame.Models;
+using TetrisGame.ILogic;
 
-namespace TetrisGame.GameLogic
+namespace TetrisGame.Logic
 {
 
     public class Tetris : ITetris
@@ -28,11 +29,6 @@ namespace TetrisGame.GameLogic
             _statsModel = statsModel;
         }
 
-        /// <summary>
-        /// Main function to run the game fully.
-        /// </summary>
-        /// <param name="rows"></param>
-        /// <param name="columns"></param>
         public void Run()
         {
             _grid.CreateGridTable(Rows, Columns);

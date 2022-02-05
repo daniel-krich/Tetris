@@ -1,21 +1,19 @@
 ﻿using TetrisGame.Enums;
+using TetrisGame.Logic;
 
-namespace TetrisGame.GameLogic
+namespace TetrisGame.ILogic
 {
     public interface IGrid
     {
-        void ClearPlayerCubeFromGrid();
-        void CollapsFixedCells();
+        Cube CurrentCube { get; }
+        CellType[,] CurrentGrid { get; }
+
         void ConvertAllPlayerCellToFixed();
-        void CreateNewPlayerCube();
-        int GetActiveBlocks();
         void CreateGridTable(int rows, int column);
-        Cube GetCurrentCube();
-        CellType[,] GetGrid();
+        void CreateNewPlayerCube();
         bool isGameFinished();
         bool isMergeSafe(Cube cube);
         void Merge(Cube cube);
         bool UpdateGame();
-        bool WipeOutFullRows();
     }
 }

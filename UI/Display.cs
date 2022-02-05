@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TetrisGame.Enums;
-using TetrisGame.GameLogic;
+using TetrisGame.ILogic;
+using TetrisGame.Logic;
 using TetrisGame.Models;
 
 namespace TetrisGame.UI
@@ -30,11 +31,11 @@ namespace TetrisGame.UI
             DisplayControls();
             DisplayScore();
             //
-            for (int row = 0; row < _grid.GetGrid().GetLength(0); row++)
+            for (int row = 0; row < _grid.CurrentGrid.GetLength(0); row++)
             {
-                for (int column = 0; column < _grid.GetGrid().GetLength(1); column++)
+                for (int column = 0; column < _grid.CurrentGrid.GetLength(1); column++)
                 {
-                    if (_grid.GetGrid()[row, column] != CellType.None)
+                    if (_grid.CurrentGrid[row, column] != CellType.None)
                     {
                         Console.BackgroundColor = _statsModel.LevelColor;
                         Console.Write("\x20\x20");
@@ -53,7 +54,7 @@ namespace TetrisGame.UI
         /// <summary>
         /// Displays the controls to the console
         /// </summary>
-        public void DisplayControls()
+        private void DisplayControls()
         {
             Console.BackgroundColor = ConsoleColor.DarkYellow;
             Console.ForegroundColor = ConsoleColor.Black;
@@ -65,14 +66,14 @@ namespace TetrisGame.UI
         /// <summary>
         /// Displays the current score to the console
         /// </summary>
-        public void DisplayScore()
+        private void DisplayScore()
         {
             Console.BackgroundColor = _statsModel.LevelColor;
             Console.ForegroundColor = ConsoleColor.Black;
             string level = "Level: " + _statsModel.LevelName;
             Console.Write(level);
 
-            for (int i = 0; i < _grid.GetGrid().GetLength(1) * 2 - level.Length; i++)
+            for (int i = 0; i < _grid.CurrentGrid.GetLength(1) * 2 - level.Length; i++)
             {
                 Console.Write("\x20");
             }
@@ -82,7 +83,7 @@ namespace TetrisGame.UI
             string score = "Score: " + _statsModel.Score + " points";
             Console.Write(score);
 
-            for (int i = 0; i < _grid.GetGrid().GetLength(1) * 2 - score.Length; i++)
+            for (int i = 0; i < _grid.CurrentGrid.GetLength(1) * 2 - score.Length; i++)
             {
                 Console.Write("\x20");
             }

@@ -5,7 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TetrisGame.Core;
-using TetrisGame.GameLogic;
+using TetrisGame.Logic;
+using TetrisGame.ILogic;
 
 namespace TetrisGame
 {
