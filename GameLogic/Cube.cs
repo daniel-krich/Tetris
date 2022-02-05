@@ -3,44 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TetrisGame.Core;
+using TetrisGame.Enums;
+using TetrisGame.Models;
 
-namespace TetrisGame.Tetris.Game
+namespace TetrisGame.GameLogic
 {
-    using TetrisGame.Tetris.Controls;
 
-    /// <summary>
-    /// Cube type enum
-    /// </summary>
-    enum CubeType
+    public class Cube : ICube
     {
-        l_shape,
-        J_shape,
-        L_shape,
-        O_shape,
-        Z_shape,
-        T_shape,
-        S_shape,
-    }
-
-    class Cube
-    {
-        public static Random random = new Random();
-
         public CellType[,] cube { get; set; }
 
         public CubeType type { get; set; }
 
-        private Grid grid { get; set; }
-        private Stats stats { get; set; }
+        private ITetris _tetris;
+        private IGrid _grid;
+        private IStatsModel _statsModel;
 
-        private int rows, columns;
-
-        public Cube(Grid grid, int rows, int columns, Stats stats)
+        public Cube(ITetris tetris, IGrid grid, IStatsModel statsModel)
         {
-            this.grid = grid;
-            this.rows = rows;
-            this.columns = columns;
-            this.stats = stats;
+            _tetris = tetris;
+            _grid = grid;
+            _statsModel = statsModel;
             //
             var (CubeMatrix, CubeMartixType) = RandomCube();
             this.cube = CubeMatrix;
@@ -53,58 +37,58 @@ namespace TetrisGame.Tetris.Game
         /// <returns>Tuple of a new 2D array where only the shape exists, and current shape type</returns>
         public (CellType[,], CubeType) RandomCube()
         {
-            CellType[,] randCube = new CellType[this.rows, this.columns];
+            CellType[,] randCube = new CellType[_tetris.Rows, _tetris.Columns];
             CubeType randType = 0;
-            switch (random.Next(1, 8))
+            switch (Utils.random.Next(1, 8))
             {
                 case 1: // l_shape
                     randType = CubeType.l_shape;
-                    randCube[0, 0 + this.columns / 2] = CellType.PlayerCell;
-                    randCube[1, 0 + this.columns / 2] = CellType.PlayerCell;
-                    randCube[2, 0 + this.columns / 2] = CellType.PlayerCell;
-                    randCube[3, 0 + this.columns / 2] = CellType.PlayerCell;
+                    randCube[0, 0 + _tetris.Columns / 2] = CellType.PlayerCell;
+                    randCube[1, 0 + _tetris.Columns / 2] = CellType.PlayerCell;
+                    randCube[2, 0 + _tetris.Columns / 2] = CellType.PlayerCell;
+                    randCube[3, 0 + _tetris.Columns / 2] = CellType.PlayerCell;
                     break;
                 case 2: // J_shape
                     randType = CubeType.J_shape;
-                    randCube[0, 3 + this.columns / 2 - 2] = CellType.PlayerCell;
-                    randCube[1, 3 + this.columns / 2 - 2] = CellType.PlayerCell;
-                    randCube[2, 3 + this.columns / 2 - 2] = CellType.PlayerCell;
-                    randCube[2, 2 + this.columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[0, 3 + _tetris.Columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[1, 3 + _tetris.Columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[2, 3 + _tetris.Columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[2, 2 + _tetris.Columns / 2 - 2] = CellType.PlayerCell;
                     break;
                 case 3: // L_shape
                     randType = CubeType.L_shape;
-                    randCube[0, 0 + this.columns / 2] = CellType.PlayerCell;
-                    randCube[1, 0 + this.columns / 2] = CellType.PlayerCell;
-                    randCube[2, 0 + this.columns / 2] = CellType.PlayerCell;
-                    randCube[2, 1 + this.columns / 2] = CellType.PlayerCell;
+                    randCube[0, 0 + _tetris.Columns / 2] = CellType.PlayerCell;
+                    randCube[1, 0 + _tetris.Columns / 2] = CellType.PlayerCell;
+                    randCube[2, 0 + _tetris.Columns / 2] = CellType.PlayerCell;
+                    randCube[2, 1 + _tetris.Columns / 2] = CellType.PlayerCell;
                     break;
                 case 4: // O_shape
                     randType = CubeType.O_shape;
-                    randCube[1, 1 + this.columns / 2 - 2] = CellType.PlayerCell;
-                    randCube[1, 2 + this.columns / 2 - 2] = CellType.PlayerCell;
-                    randCube[2, 1 + this.columns / 2 - 2] = CellType.PlayerCell;
-                    randCube[2, 2 + this.columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[1, 1 + _tetris.Columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[1, 2 + _tetris.Columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[2, 1 + _tetris.Columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[2, 2 + _tetris.Columns / 2 - 2] = CellType.PlayerCell;
                     break;
                 case 5: // Z_shape
                     randType = CubeType.Z_shape;
-                    randCube[1, 1 + this.columns / 2] = CellType.PlayerCell;
-                    randCube[1, 2 + this.columns / 2] = CellType.PlayerCell;
-                    randCube[2, 2 + this.columns / 2] = CellType.PlayerCell;
-                    randCube[2, 3 + this.columns / 2] = CellType.PlayerCell;
+                    randCube[1, 1 + _tetris.Columns / 2] = CellType.PlayerCell;
+                    randCube[1, 2 + _tetris.Columns / 2] = CellType.PlayerCell;
+                    randCube[2, 2 + _tetris.Columns / 2] = CellType.PlayerCell;
+                    randCube[2, 3 + _tetris.Columns / 2] = CellType.PlayerCell;
                     break;
                 case 6: // T_shape
                     randType = CubeType.T_shape;
-                    randCube[2, 1 + this.columns / 2 - 2] = CellType.PlayerCell;
-                    randCube[3, 0 + this.columns / 2 - 2] = CellType.PlayerCell;
-                    randCube[3, 1 + this.columns / 2 - 2] = CellType.PlayerCell;
-                    randCube[3, 2 + this.columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[2, 1 + _tetris.Columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[3, 0 + _tetris.Columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[3, 1 + _tetris.Columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[3, 2 + _tetris.Columns / 2 - 2] = CellType.PlayerCell;
                     break;
                 case 7: // S_shape
                     randType = CubeType.S_shape;
-                    randCube[1, 3 + this.columns / 2 - 2] = CellType.PlayerCell;
-                    randCube[1, 2 + this.columns / 2 - 2] = CellType.PlayerCell;
-                    randCube[2, 2 + this.columns / 2 - 2] = CellType.PlayerCell;
-                    randCube[2, 1 + this.columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[1, 3 + _tetris.Columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[1, 2 + _tetris.Columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[2, 2 + _tetris.Columns / 2 - 2] = CellType.PlayerCell;
+                    randCube[2, 1 + _tetris.Columns / 2 - 2] = CellType.PlayerCell;
                     break;
                 default:
                     break;
@@ -134,7 +118,7 @@ namespace TetrisGame.Tetris.Game
                 }
             }
 
-            
+
 
             for (int row = maxRowVal, offset = 0; row >= minRowVal; row--, offset++)
             {
@@ -149,11 +133,11 @@ namespace TetrisGame.Tetris.Game
                     }
                 }
             }
-            
 
 
-            if (this.grid.isMergeSafe(this))
-                this.grid.Merge(this);
+
+            if (_grid.isMergeSafe(this))
+                _grid.Merge(this);
             else
                 this.cube = localClone;
         }
@@ -185,22 +169,22 @@ namespace TetrisGame.Tetris.Game
                                 else
                                 {
                                     this.cube = localClone;
-                                    this.stats.Score += 5;
-                                    this.grid.ConvertAllPlayerCellToFixed();
-                                    this.grid.CreateNewPlayerCube();
+                                    _statsModel.Score += 5;
+                                    _grid.ConvertAllPlayerCellToFixed();
+                                    _grid.CreateNewPlayerCube();
                                     return false;
                                 }
                             }
                         }
                     }
-                    if (this.grid.isMergeSafe(this) && !cloneMove)
+                    if (_grid.isMergeSafe(this) && !cloneMove)
                     {
-                        this.stats.Score += 1;
-                        this.grid.Merge(this);
+                        _statsModel.Score += 1;
+                        _grid.Merge(this);
                         Move(key, !cloneMove);
                         return true;
                     }
-                    else if(this.grid.isMergeSafe(this) && cloneMove)
+                    else if (_grid.isMergeSafe(this) && cloneMove)
                     {
                         this.cube = localClone;
                         return false;
@@ -208,9 +192,9 @@ namespace TetrisGame.Tetris.Game
                     else
                     {
                         this.cube = localClone;
-                        this.stats.Score += 5;
-                        this.grid.ConvertAllPlayerCellToFixed();
-                        this.grid.CreateNewPlayerCube();
+                        _statsModel.Score += 5;
+                        _grid.ConvertAllPlayerCellToFixed();
+                        _grid.CreateNewPlayerCube();
                         return false;
                     }
 
@@ -234,9 +218,9 @@ namespace TetrisGame.Tetris.Game
                             }
                         }
                     }
-                    if (this.grid.isMergeSafe(this))
+                    if (_grid.isMergeSafe(this))
                     {
-                        this.grid.Merge(this);
+                        _grid.Merge(this);
                         return true;
                     }
                     else
@@ -265,9 +249,9 @@ namespace TetrisGame.Tetris.Game
                             }
                         }
                     }
-                    if (this.grid.isMergeSafe(this))
+                    if (_grid.isMergeSafe(this))
                     {
-                        this.grid.Merge(this);
+                        _grid.Merge(this);
                         return true;
                     }
                     else
@@ -275,7 +259,7 @@ namespace TetrisGame.Tetris.Game
                         this.cube = localClone;
                         return false;
                     }
-                    
+
                 default:
                     return false;
             }

@@ -3,19 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TetrisGame.Enums;
+using TetrisGame.GameLogic;
+using TetrisGame.Models;
 
-namespace TetrisGame.Tetris.Display
+namespace TetrisGame.UI
 {
-    using TetrisGame.Tetris.Game;
-    class Display
+    class Display : IDisplay
     {
-        private Grid grid;
-        private Stats stats;
+        private IGrid _grid;
+        private IStatsModel _statsModel;
 
-        public Display(Grid grid, Stats stats)
+        public Display(IGrid grid, IStatsModel statsModel)
         {
-            this.grid = grid;
-            this.stats = stats;
+            _grid = grid;
+            _statsModel = statsModel;
         }
 
         /// <summary>
@@ -28,13 +30,13 @@ namespace TetrisGame.Tetris.Display
             DisplayControls();
             DisplayScore();
             //
-            for (int row = 0; row < grid.GetGrid().GetLength(0); row++)
+            for (int row = 0; row < _grid.GetGrid().GetLength(0); row++)
             {
-                for (int column = 0; column < grid.GetGrid().GetLength(1); column++)
+                for (int column = 0; column < _grid.GetGrid().GetLength(1); column++)
                 {
-                    if (grid.GetGrid()[row, column] != CellType.None)
+                    if (_grid.GetGrid()[row, column] != CellType.None)
                     {
-                        Console.BackgroundColor = this.stats.LevelColor;
+                        Console.BackgroundColor = _statsModel.LevelColor;
                         Console.Write("\x20\x20");
                     }
                     else
@@ -65,22 +67,22 @@ namespace TetrisGame.Tetris.Display
         /// </summary>
         public void DisplayScore()
         {
-            Console.BackgroundColor = this.stats.LevelColor;
+            Console.BackgroundColor = _statsModel.LevelColor;
             Console.ForegroundColor = ConsoleColor.Black;
-            string level = "Level: " + this.stats.LevelName;
+            string level = "Level: " + _statsModel.LevelName;
             Console.Write(level);
 
-            for (int i = 0; i < this.grid.GetGrid().GetLength(1) * 2 - level.Length; i++)
+            for (int i = 0; i < _grid.GetGrid().GetLength(1) * 2 - level.Length; i++)
             {
                 Console.Write("\x20");
             }
             Console.WriteLine();
 
             //
-            string score = "Score: "+ this.stats.Score + " points";
+            string score = "Score: " + _statsModel.Score + " points";
             Console.Write(score);
 
-            for(int i = 0; i < this.grid.GetGrid().GetLength(1)*2 - score.Length; i++)
+            for (int i = 0; i < _grid.GetGrid().GetLength(1) * 2 - score.Length; i++)
             {
                 Console.Write("\x20");
             }

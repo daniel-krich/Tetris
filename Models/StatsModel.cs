@@ -4,40 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TetrisGame.Tetris.Game
+namespace TetrisGame.Models
 {
-    class Stats
+    public class StatsModel : IStatsModel
     {
-        private int score;
-
-        public Stats()
-        {
-            this.score = 0;
-        }
-
-        public int Score
-        {
-            get
-            {
-                return this.score;
-            }
-            set
-            {
-                this.score = value;
-            }
-        }
+        public int Score { get; set; }
 
         public int Level
         {
             get
             {
-                if (this.score >= 2000)
+                if (Score >= 2000)
                     return 5;
-                else if (this.score >= 1000)
+                else if (Score >= 1000)
                     return 4;
-                else if (this.score >= 300)
+                else if (Score >= 300)
                     return 3;
-                else if (this.score >= 100)
+                else if (Score >= 100)
                     return 2;
                 return 1;
             }
@@ -47,7 +30,7 @@ namespace TetrisGame.Tetris.Game
         {
             get
             {
-                switch(this.Level)
+                switch (this.Level)
                 {
                     case 1:
                         return 500;
@@ -107,6 +90,11 @@ namespace TetrisGame.Tetris.Game
                         return "Newbie Green";
                 }
             }
+        }
+
+        public StatsModel()
+        {
+
         }
     }
 }

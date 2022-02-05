@@ -1,36 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TetrisGame.Enums;
+using TetrisGame.Models;
+using TetrisGame.Core;
 
-namespace TetrisGame.Tetris.Game
+namespace TetrisGame.GameLogic
 {
-    /// <summary>
-    /// None = empty cell.
-    /// FixedCell = occupied cell, non controllable.
-    /// PlayerCell = temporary occupied cell, controllable by the player.
-    /// </summary>
-    enum CellType
+    class Grid : IGrid
     {
-        None,
-        FixedCell,
-        PlayerCell
-    }
+        private CellType[,] _gridTable;
 
-    class Grid
-    {
-        private CellType[,] gridTable { get; set; }
+        private Cube _currentCube;
 
-        private Cube currentCube { get; set; }
+        private IStatsModel _statsModel;
 
-        private Stats stats { get; set; }
-
-        public Grid(int rows, int columns, Stats stats)
+        public Grid(IStatsModel statsModel)
         {
-            this.gridTable = new CellType[rows, columns];
-            this.stats = stats;
+            _statsModel = statsModel;
+        }
 
+        public void CreateGridTable(int rows, int column)
+        {
+            _gridTable = new CellType[rows, column];
             CreateNewPlayerCube();
         }
 
@@ -39,12 +34,12 @@ namespace TetrisGame.Tetris.Game
         /// </summary>
         public void ClearPlayerCubeFromGrid()
         {
-            for (int row = 0; row < this.gridTable.GetLength(0); row++)
+            for (int row = 0; row < _gridTable.GetLength(0); row++)
             {
-                for (int column = 0; column < this.gridTable.GetLength(1); column++)
+                for (int column = 0; column < _gridTable.GetLength(1); column++)
                 {
-                    if (this.gridTable[row, column] == CellType.PlayerCell)
-                        this.gridTable[row, column] = CellType.None;
+                    if (_gridTable[row, column] == CellType.PlayerCell)
+                        _gridTable[row, column] = CellType.None;
                 }
             }
         }
@@ -57,7 +52,7 @@ namespace TetrisGame.Tetris.Game
         {
             if (isGameFinished())
                 return false;
-            if (!isMergeSafe(this.currentCube))
+            if (!isMergeSafe(_currentCube))
                 return false;
             return true;
         }
@@ -68,9 +63,9 @@ namespace TetrisGame.Tetris.Game
         /// <returns></returns>
         public bool isGameFinished()
         {
-            for (int column = 0; column < this.gridTable.GetLength(1); column++)
+            for (int column = 0; column < _gridTable.GetLength(1); column++)
             {
-                if (this.gridTable[0, column] == CellType.FixedCell)
+                if (_gridTable[0, column] == CellType.FixedCell)
                     return true;
             }
 
@@ -85,7 +80,7 @@ namespace TetrisGame.Tetris.Game
         {
             int activeBlocks = 0;
 
-            foreach (CellType Cell in this.gridTable)
+            foreach (CellType Cell in _gridTable)
                 if (Cell != CellType.None)
                     activeBlocks++;
 
@@ -103,7 +98,7 @@ namespace TetrisGame.Tetris.Game
             {
                 for (int column = 0; column < cube.GetCube().GetLength(1); column++)
                 {
-                    if (cube.GetCube()[row, column] != CellType.None && this.gridTable[row, column] == CellType.FixedCell)
+                    if (cube.GetCube()[row, column] != CellType.None && _gridTable[row, column] == CellType.FixedCell)
                         return false;
                 }
             }
@@ -116,10 +111,10 @@ namespace TetrisGame.Tetris.Game
         /// </summary>
         public void CreateNewPlayerCube()
         {
-            this.currentCube = new Cube(this, this.gridTable.GetLength(0), this.gridTable.GetLength(1), this.stats);
-            if (isMergeSafe(this.currentCube))
+            _currentCube = AppServices.ServiceProvider.GetRequiredService<ICube>() as Cube;
+            if (isMergeSafe(_currentCube))
             {
-                Merge(this.currentCube);
+                Merge(_currentCube);
             }
         }
 
@@ -131,7 +126,7 @@ namespace TetrisGame.Tetris.Game
         {
             ClearPlayerCubeFromGrid();
 
-            while(WipeOutFullRows())
+            while (WipeOutFullRows())
                 CollapsFixedCells();
 
             for (int row = 0; row < cube.GetCube().GetLength(0); row++)
@@ -140,7 +135,7 @@ namespace TetrisGame.Tetris.Game
                 {
                     if (cube.GetCube()[row, column] != CellType.None)
                     {
-                        this.gridTable[row, column] = cube.GetCube()[row, column];
+                        _gridTable[row, column] = cube.GetCube()[row, column];
                     }
                 }
             }
@@ -151,12 +146,12 @@ namespace TetrisGame.Tetris.Game
         /// </summary>
         public void ConvertAllPlayerCellToFixed()
         {
-            for (int row = 0; row < this.gridTable.GetLength(0); row++)
+            for (int row = 0; row < _gridTable.GetLength(0); row++)
             {
-                for (int column = 0; column < this.gridTable.GetLength(1); column++)
+                for (int column = 0; column < _gridTable.GetLength(1); column++)
                 {
-                    if (this.gridTable[row, column] == CellType.PlayerCell)
-                        this.gridTable[row, column] = CellType.FixedCell;
+                    if (_gridTable[row, column] == CellType.PlayerCell)
+                        _gridTable[row, column] = CellType.FixedCell;
                 }
             }
         }
@@ -168,24 +163,24 @@ namespace TetrisGame.Tetris.Game
         /// <returns>True if wiped some rows, False otherwise</returns>
         public bool WipeOutFullRows()
         {
-            for (int row = 0; row < this.gridTable.GetLength(0); row++)
+            for (int row = 0; row < _gridTable.GetLength(0); row++)
             {
                 int fullCount = 0;
-                for (int column = 0; column < this.gridTable.GetLength(1); column++)
+                for (int column = 0; column < _gridTable.GetLength(1); column++)
                 {
-                    if (this.gridTable[row, column] == CellType.FixedCell)
+                    if (_gridTable[row, column] == CellType.FixedCell)
                         fullCount++;
                     else
                         break;
                 }
 
-                if (fullCount >= this.gridTable.GetLength(1))
+                if (fullCount >= _gridTable.GetLength(1))
                 {
-                    this.stats.Score += this.gridTable.GetLength(1);
+                    _statsModel.Score += _gridTable.GetLength(1);
 
-                    for (int column = 0; column < this.gridTable.GetLength(1); column++)
+                    for (int column = 0; column < _gridTable.GetLength(1); column++)
                     {
-                        this.gridTable[row, column] = CellType.None;
+                        _gridTable[row, column] = CellType.None;
                     }
                     return true;
                 }
@@ -198,21 +193,21 @@ namespace TetrisGame.Tetris.Game
         /// </summary>
         public void CollapsFixedCells()
         {
-            for (int row = this.gridTable.GetLength(0) - 1; row >= 0; row--)
+            for (int row = _gridTable.GetLength(0) - 1; row >= 0; row--)
             {
-                for (int column = 0; column < this.gridTable.GetLength(1); column++)
+                for (int column = 0; column < _gridTable.GetLength(1); column++)
                 {
                     int rowHeight = 0;
-                    while (row + (rowHeight+1) < this.gridTable.GetLength(0) && this.gridTable[row + (rowHeight+1), column] == CellType.None &&
-                        this.gridTable[row, column] == CellType.FixedCell)
+                    while (row + (rowHeight + 1) < _gridTable.GetLength(0) && _gridTable[row + (rowHeight + 1), column] == CellType.None &&
+                        _gridTable[row, column] == CellType.FixedCell)
                     {
                         rowHeight++;
                     }
 
                     if (rowHeight > 0)
                     {
-                        this.gridTable[row, column] = CellType.None;
-                        this.gridTable[row + rowHeight, column] = CellType.FixedCell;
+                        _gridTable[row, column] = CellType.None;
+                        _gridTable[row + rowHeight, column] = CellType.FixedCell;
                     }
                 }
             }
@@ -222,13 +217,13 @@ namespace TetrisGame.Tetris.Game
         /// Gets the grid or 2D array instance
         /// </summary>
         /// <returns>2D array instance</returns>
-        public CellType[,] GetGrid() => this.gridTable;
+        public CellType[,] GetGrid() => _gridTable;
 
         /// <summary>
         /// Get the current cube instance
         /// </summary>
         /// <returns>Cube instance</returns>
-        public Cube GetCurrentCube() => this.currentCube;
+        public Cube GetCurrentCube() => _currentCube;
 
     }
 }
