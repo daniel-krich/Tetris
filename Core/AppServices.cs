@@ -12,12 +12,22 @@ using TetrisGame.ILogic;
 namespace TetrisGame.Core
 {
 
-    public class AppServices
+    public static class AppServices
     {
         private static IServiceProvider _serviceProvider;
-        public static IServiceProvider ServiceProvider { get => _serviceProvider; }
+        private static readonly object _object = new object();
+        public static IServiceProvider ServiceProvider
+        {
+            get
+            {
+                lock (_object)
+                {
+                    return _serviceProvider ?? Configure();
+                }
+            }
+        }
 
-        public static IServiceProvider Configure()
+        private static IServiceProvider Configure()
         {
             var services = new ServiceCollection();
             services.AddSingleton<ICube, Cube>();

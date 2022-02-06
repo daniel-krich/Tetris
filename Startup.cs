@@ -14,9 +14,8 @@ namespace TetrisGame
     {
         public static void Start()
         {
-            var services = AppServices.Configure();
-            ITetris t = services.GetRequiredService<ITetris>();
-            t.Run(20, 10);
+            ITetris tetris = AppServices.ServiceProvider.GetRequiredService<ITetris>();
+            tetris.Run(20, 10);
 
             Wait();
         }
