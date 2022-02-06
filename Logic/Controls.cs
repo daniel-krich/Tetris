@@ -47,9 +47,9 @@ namespace TetrisGame.Logic
                 if (Utils.GetKeyState((int)entry.Key) < 0 && !_pressMap[entry.Key])
                 {
                     if (entry.Key != VirtualKeyCodes.X_KEY)
-                        _grid.CurrentCube.Move(entry.Key);
+                        _grid.MoveCube(entry.Key);
                     else
-                        _grid.CurrentCube.Rotate();
+                        _grid.RotateCube();
 
                     _display.UpdateFrame();
                     _pressMap[entry.Key] = true;
@@ -61,7 +61,7 @@ namespace TetrisGame.Logic
             }
             if (FallDelay < DateTime.Now.Ticks)
             {
-                _grid.CurrentCube.Move(VirtualKeyCodes.VK_DOWN);
+                _grid.MoveCube(VirtualKeyCodes.VK_DOWN);
                 _display.UpdateFrame();
                 FallDelay = DateTime.Now.Ticks + 10000 * _statsModel.DelayLevel;
             }

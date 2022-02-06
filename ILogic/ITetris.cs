@@ -2,8 +2,6 @@
 {
     public interface ITetris
     {
-        int Rows { get; set; }
-        int Columns { get; set; }
-        void Run();
+        void Run(int rows, int columns);
     }
 }

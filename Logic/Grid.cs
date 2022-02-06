@@ -21,10 +21,11 @@ namespace TetrisGame.Logic
 
         public CellType[,] CurrentGrid { get => _gridTable; }
 
-        public Cube CurrentCube { get => _cube as Cube; }
+        public ICube CurrentCube { get => _cube; }
 
-        public Grid(IStatsModel statsModel)
+        public Grid(IStatsModel statsModel, ICube cube)
         {
+            _cube = cube;
             _statsModel = statsModel;
         }
 
@@ -57,7 +58,7 @@ namespace TetrisGame.Logic
         {
             if (isGameFinished())
                 return false;
-            if (!isMergeSafe(_cube as Cube))
+            if (!isMergeCubeWithGridSafe())
                 return false;
             return true;
         }
@@ -65,7 +66,6 @@ namespace TetrisGame.Logic
         /// <summary>
         /// Checks if the game finished or player lost.
         /// </summary>
-        /// <returns></returns>
         public bool isGameFinished()
         {
             for (int column = 0; column < _gridTable.GetLength(1); column++)
@@ -80,15 +80,13 @@ namespace TetrisGame.Logic
         /// <summary>
         /// Checks if Shape grid and the game grid can merge safely without any cell loss or overrides.
         /// </summary>
-        /// <param name="cube">Cube instance</param>
-        /// <returns>True if safe, False otherwise</returns>
-        public bool isMergeSafe(Cube cube)
+        public bool isMergeCubeWithGridSafe()
         {
-            for (int row = 0; row < cube.CurrentCube.GetLength(0); row++)
+            for (int row = 0; row < CurrentCube.CurrentMatrix.GetLength(0); row++)
             {
-                for (int column = 0; column < cube.CurrentCube.GetLength(1); column++)
+                for (int column = 0; column < CurrentCube.CurrentMatrix.GetLength(1); column++)
                 {
-                    if (cube.CurrentCube[row, column] != CellType.None && _gridTable[row, column] == CellType.FixedCell)
+                    if (CurrentCube.CurrentMatrix[row, column] != CellType.None && _gridTable[row, column] == CellType.FixedCell)
                         return false;
                 }
             }
@@ -101,34 +99,30 @@ namespace TetrisGame.Logic
         /// </summary>
         public void CreateNewPlayerCube()
         {
-            if (_cube is null)
-                _cube = AppServices.ServiceProvider.GetRequiredService<ICube>();
-
-            _cube.RecreateCube();
-            if (isMergeSafe(_cube as Cube))
+            _cube.RecreateCube(this);
+            if (isMergeCubeWithGridSafe())
             {
-                Merge(_cube as Cube);
+                MergeCubeWithGrid();
             }
         }
 
         /// <summary>
         /// Merges 2 grids together
         /// </summary>
-        /// <param name="cube">Cube instance</param>
-        public void Merge(Cube cube)
+        public void MergeCubeWithGrid()
         {
             ClearPlayerCubeFromGrid();
 
             while (WipeOutFullRows())
                 CollapsFixedCells();
 
-            for (int row = 0; row < cube.CurrentCube.GetLength(0); row++)
+            for (int row = 0; row < CurrentCube.CurrentMatrix.GetLength(0); row++)
             {
-                for (int column = 0; column < cube.CurrentCube.GetLength(1); column++)
+                for (int column = 0; column < CurrentCube.CurrentMatrix.GetLength(1); column++)
                 {
-                    if (cube.CurrentCube[row, column] != CellType.None)
+                    if (CurrentCube.CurrentMatrix[row, column] != CellType.None)
                     {
-                        _gridTable[row, column] = cube.CurrentCube[row, column];
+                        _gridTable[row, column] = CurrentCube.CurrentMatrix[row, column];
                     }
                 }
             }
@@ -203,6 +197,174 @@ namespace TetrisGame.Logic
                         _gridTable[row + rowHeight, column] = CellType.FixedCell;
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Rotates the shape 180 degrees each call.
+        /// </summary>
+        public void RotateCube()
+        {
+            CellType[,] localClone = CurrentCube.CurrentMatrix.Clone() as CellType[,];
+            int maxRowVal = 0;
+            int minRowVal = 0;
+            for (int row = 0; row < CurrentCube.CurrentMatrix.GetLength(0); row++)
+            {
+                for (int column = 0; column < CurrentCube.CurrentMatrix.GetLength(1); column++)
+                {
+                    if (CurrentCube.CurrentMatrix[row, column] == CellType.PlayerCell)
+                    {
+                        if (minRowVal == 0)
+                            minRowVal = row;
+                        maxRowVal = row;
+                    }
+                }
+            }
+
+
+
+            for (int row = maxRowVal, offset = 0; row >= minRowVal; row--, offset++)
+            {
+                for (int column = 0; column < CurrentCube.CurrentMatrix.GetLength(1); column++)
+                {
+                    if (minRowVal + offset - (maxRowVal - minRowVal) >= 0 &&
+                        maxRowVal - offset + (maxRowVal - minRowVal) < CurrentCube.CurrentMatrix.GetLength(0))
+                    {
+                        CellType swap = CurrentCube.CurrentMatrix[maxRowVal - offset + (maxRowVal - minRowVal), column];
+                        CurrentCube.CurrentMatrix[maxRowVal - offset + (maxRowVal - minRowVal), column] = CurrentCube.CurrentMatrix[minRowVal + offset - (maxRowVal - minRowVal), column];
+                        CurrentCube.CurrentMatrix[minRowVal + offset - (maxRowVal - minRowVal), column] = swap;
+                    }
+                }
+            }
+
+
+
+            if (isMergeCubeWithGridSafe())
+                MergeCubeWithGrid();
+            else
+                CurrentCube.CurrentMatrix = localClone;
+        }
+
+
+        /// <summary>
+        /// Moves the shape Left/Right/Down on the grid.
+        /// </summary>
+        /// <param name="key">GameKeys enum (Down, Left, Right, X)</param>
+        /// <param name="cloneMove">used to predict if the next move is a dead end</param>
+        /// <returns>false if can't move that direction, or true otherwise.</returns>
+        public bool MoveCube(VirtualKeyCodes key, bool cloneMove = false)
+        {
+            CellType[,] localClone = CurrentCube.CurrentMatrix.Clone() as CellType[,];
+            switch (key)
+            {
+                case VirtualKeyCodes.VK_DOWN:
+                    for (int row = CurrentCube.CurrentMatrix.GetLength(0) - 1; row >= 0; row--)
+                    {
+                        for (int column = 0; column < CurrentCube.CurrentMatrix.GetLength(1); column++)
+                        {
+                            if (CurrentCube.CurrentMatrix[row, column] == CellType.PlayerCell)
+                            {
+                                if (row < CurrentCube.CurrentMatrix.GetLength(0) - 1)
+                                {
+                                    CurrentCube.CurrentMatrix[row, column] = CellType.None;
+                                    CurrentCube.CurrentMatrix[row + 1, column] = CellType.PlayerCell;
+                                }
+                                else
+                                {
+                                    CurrentCube.CurrentMatrix = localClone;
+                                    _statsModel.Score += 5;
+                                    ConvertAllPlayerCellToFixed();
+                                    CreateNewPlayerCube();
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                    if (isMergeCubeWithGridSafe() && !cloneMove)
+                    {
+                        _statsModel.Score += 1;
+                        MergeCubeWithGrid();
+                        MoveCube(key, !cloneMove);
+                        return true;
+                    }
+                    else if (isMergeCubeWithGridSafe() && cloneMove)
+                    {
+                        CurrentCube.CurrentMatrix = localClone;
+                        return false;
+                    }
+                    else
+                    {
+                        CurrentCube.CurrentMatrix = localClone;
+                        _statsModel.Score += 5;
+                        ConvertAllPlayerCellToFixed();
+                        CreateNewPlayerCube();
+                        return false;
+                    }
+
+                case VirtualKeyCodes.VK_LEFT:
+                    for (int row = 0; row < CurrentCube.CurrentMatrix.GetLength(0); row++)
+                    {
+                        for (int column = 0; column < CurrentCube.CurrentMatrix.GetLength(1); column++)
+                        {
+                            if (CurrentCube.CurrentMatrix[row, column] == CellType.PlayerCell)
+                            {
+                                if (column > 0)
+                                {
+                                    CurrentCube.CurrentMatrix[row, column] = CellType.None;
+                                    CurrentCube.CurrentMatrix[row, column - 1] = CellType.PlayerCell;
+                                }
+                                else
+                                {
+                                    CurrentCube.CurrentMatrix = localClone;
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                    if (isMergeCubeWithGridSafe())
+                    {
+                        MergeCubeWithGrid();
+                        return true;
+                    }
+                    else
+                    {
+                        CurrentCube.CurrentMatrix = localClone;
+                        return false;
+                    }
+
+                case VirtualKeyCodes.VK_RIGHT:
+                    for (int row = 0; row < CurrentCube.CurrentMatrix.GetLength(0); row++)
+                    {
+                        for (int column = CurrentCube.CurrentMatrix.GetLength(1) - 1; column >= 0; column--)
+                        {
+                            if (CurrentCube.CurrentMatrix[row, column] == CellType.PlayerCell)
+                            {
+                                if (column < CurrentCube.CurrentMatrix.GetLength(1) - 1)
+                                {
+                                    CurrentCube.CurrentMatrix[row, column] = CellType.None;
+                                    CurrentCube.CurrentMatrix[row, column + 1] = CellType.PlayerCell;
+                                }
+                                else
+                                {
+                                    CurrentCube.CurrentMatrix = localClone;
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                    if (isMergeCubeWithGridSafe())
+                    {
+                        MergeCubeWithGrid();
+                        return true;
+                    }
+                    else
+                    {
+                        CurrentCube.CurrentMatrix = localClone;
+                        return false;
+                    }
+
+                default:
+                    return false;
             }
         }
     }

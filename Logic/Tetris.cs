@@ -18,9 +18,6 @@ namespace TetrisGame.Logic
         private IDisplay _display;
         private IStatsModel _statsModel;
 
-        public int Rows { get; set; } = 20;
-        public int Columns { get; set; } = 10;
-
         public Tetris(IGrid grid, IControls controls, IDisplay display, IStatsModel statsModel)
         {
             _grid = grid;
@@ -29,9 +26,14 @@ namespace TetrisGame.Logic
             _statsModel = statsModel;
         }
 
-        public void Run()
+        /// <summary>
+        /// Run the game.
+        /// </summary>
+        /// <param name="rows">Game height</param>
+        /// <param name="columns">Game width</param>
+        public void Run(int rows, int columns)
         {
-            _grid.CreateGridTable(Rows, Columns);
+            _grid.CreateGridTable(rows, columns);
 
             _display.UpdateFrame();
 
@@ -42,7 +44,7 @@ namespace TetrisGame.Logic
 
             Console.BackgroundColor = ConsoleColor.DarkMagenta;
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("\nGame Over, structure got too high! you scored {0} points\n", _statsModel.Score);
+            Console.WriteLine("\nGame Over! you scored {0} points\n", _statsModel.Score);
             Console.ResetColor();
         }
     }

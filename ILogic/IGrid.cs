@@ -5,15 +5,17 @@ namespace TetrisGame.ILogic
 {
     public interface IGrid
     {
-        Cube CurrentCube { get; }
+        ICube CurrentCube { get; }
         CellType[,] CurrentGrid { get; }
 
         void ConvertAllPlayerCellToFixed();
         void CreateGridTable(int rows, int column);
         void CreateNewPlayerCube();
         bool isGameFinished();
-        bool isMergeSafe(Cube cube);
-        void Merge(Cube cube);
+        bool isMergeCubeWithGridSafe();
+        void MergeCubeWithGrid();
+        bool MoveCube(VirtualKeyCodes key, bool cloneMove = false);
+        void RotateCube();
         bool UpdateGame();
     }
 }

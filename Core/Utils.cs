@@ -12,6 +12,6 @@ namespace TetrisGame.Core
         [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
         public static extern short GetKeyState(int nVirtKey);
 
-        public static Random random = new Random();
+        public static Random Random { get; } = new Random();
     }
 }

@@ -20,7 +20,7 @@ namespace TetrisGame.Core
         public static IServiceProvider Configure()
         {
             var services = new ServiceCollection();
-            services.AddTransient<ICube, Cube>();
+            services.AddSingleton<ICube, Cube>();
             services.AddSingleton<IControls, Controls>();
             services.AddSingleton<IGrid, Grid>();
             services.AddSingleton<IDisplay, Display>();

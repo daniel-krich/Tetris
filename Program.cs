@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using TetrisGame.Core;
 using TetrisGame.Logic;
 using TetrisGame.ILogic;
+using System.Threading;
 
 namespace TetrisGame
 {
@@ -14,9 +15,7 @@ namespace TetrisGame
     {
         static void Main(string[] args)
         {
-            var services = AppServices.Configure();
-            ITetris t = services.GetRequiredService<ITetris>();
-            t.Run();
+            Startup.Start();
         }
     }
 }
