@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using TetrisGame.UI;
 using TetrisGame.Models;
-using TetrisGame.ILogic;
+using TetrisGame.Contracts;
 
 namespace TetrisGame.Logic
 {

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TetrisGame.Core;
 using TetrisGame.Enums;
-using TetrisGame.ILogic;
+using TetrisGame.Contracts;
 using TetrisGame.Models;
 
 namespace TetrisGame.Logic

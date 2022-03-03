@@ -1,4 +1,4 @@
-﻿namespace TetrisGame.ILogic
+﻿namespace TetrisGame.Contracts
 {
     public interface ITetris
     {

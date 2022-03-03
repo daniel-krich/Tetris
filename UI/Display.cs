@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TetrisGame.Enums;
-using TetrisGame.ILogic;
+using TetrisGame.Contracts;
 using TetrisGame.Logic;
 using TetrisGame.Models;
 

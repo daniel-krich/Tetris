@@ -9,7 +9,7 @@ using TetrisGame.Enums;
 using TetrisGame.Models;
 using TetrisGame.UI;
 using TetrisGame.Core;
-using TetrisGame.ILogic;
+using TetrisGame.Contracts;
 
 namespace TetrisGame.Logic
 {

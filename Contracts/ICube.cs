@@ -1,6 +1,6 @@
 ﻿using TetrisGame.Enums;
 
-namespace TetrisGame.ILogic
+namespace TetrisGame.Contracts
 {
     public interface ICube
     {

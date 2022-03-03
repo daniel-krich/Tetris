@@ -1,7 +1,7 @@
 ﻿using TetrisGame.Enums;
 using TetrisGame.Logic;
 
-namespace TetrisGame.ILogic
+namespace TetrisGame.Contracts
 {
     public interface IGrid
     {
